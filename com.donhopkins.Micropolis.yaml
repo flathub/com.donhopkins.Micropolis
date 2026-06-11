@@ -1,9 +1,9 @@
 id: com.donhopkins.Micropolis
 runtime: org.freedesktop.Platform
-runtime-version: '23.08'
+runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
 command: micropolis
-rename-desktop-file: micropolis.desktop
+rename-desktop-file: Micropolis.desktop
 rename-icon: micropolis
 finish-args:
   - --share=ipc
@@ -12,15 +12,7 @@ finish-args:
   - --socket=x11
 
 modules:
-  - shared-modules/glu/glu-9.json
-
-  - name: sdl12-compat
-    buildsystem: cmake-ninja
-    sources:
-      - type: archive
-        url: https://github.com/libsdl-org/sdl12-compat/archive/refs/tags/release-1.2.52.tar.gz
-        sha256: 5bd7942703575554670a8767ae030f7921a0ac3c5e2fd173a537b7c7a8599014
-
+  - shared-modules/SDL/sdl12-compat.json
   - shared-modules/SDL/SDL_mixer-1.2.12.json
 
   - name: micropolis
@@ -28,6 +20,9 @@ modules:
     no-parallel-make: true
     subdir: src
     no-autogen: true
+    license-files:
+      - COPYING
+      - MicropolisPublicNameLicense.md
     post-install:
       - install -d -m755 ${FLATPAK_DEST}/bin
       - install -d -m755 ${FLATPAK_DEST}/share/micropolis
@@ -36,16 +31,18 @@ modules:
       - install -m755 ../Micropolis ${FLATPAK_DEST}/bin/micropolis
       - cp -a ../cities ../images ../res ${FLATPAK_DEST}/share/micropolis
       - chmod +x ${FLATPAK_DEST}/share/micropolis/res/sounds/player
-      - install -Dm644 ../Micropolis.desktop ${FLATPAK_DEST}/share/applications/micropolis.desktop
-      - install -Dm644 ../micropolis.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/micropolis.png
-      - install -Dm644 ../com.donhopkins.Micropolis.metainfo.xml ${FLATPAK_DEST}/share/metainfo/com.donhopkins.Micropolis.metainfo.xml
+      - install -Dm644 ../Micropolis.desktop -t ${FLATPAK_DEST}/share/applications/
+      - install -Dm644 ../micropolis.png -t ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/
+      - install -Dm644 ../com.donhopkins.Micropolis.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/
     sources:
       - type: git
         url: https://git.zerfleddert.de/git/micropolis
         commit: 6f873e16d6a1a8f6f59c1e5a75ec5f52ce5c89b6
       - type: patch
-        path: fhs-path.patch
-        sha256: 6f873e16d6a1a8f6f59c1e5a75ec5f52ce5c89b6
+        paths:
+          # Taken from: https://build.opensuse.org/package/show/games/micropolis
+          - patches/micropolis_git-1752177932.patch
+          - patches/fhs-path.patch
       - type: file
         path: micropolis.png
       - type: file
